@@ -30,8 +30,8 @@ WordAdapter wordAdapter;
 
     @Override
     public void onItemClick(String name) {
-        Intent i =new Intent(this,DetailWord.class);
-        i.putExtra("Name",name);
+        Intent i =new Intent(this, DetailActivity.class);
+        i.putExtra("word",name);
         startActivity(i);
     }
 
@@ -39,6 +39,13 @@ WordAdapter wordAdapter;
 
     void LoadData(){
         lstword=new ArrayList<>();
+        lstword.add(new Word("01","Love","Tinh Yeu"));
+        lstword.add((new Word("02","Fuck","Con me may")));
+        lstword.add(new Word("01","Love","Tinh Yeu"));
+        lstword.add(new Word("01","Love","Tinh Yeu"));
+        lstword.add(new Word("01","Love","Tinh Yeu"));
+        lstword.add(new Word("01","Love","Tinh Yeu"));
+        lstword.add(new Word("01","Love","Tinh Yeu"));
         lstword.add(new Word("01","Love","Tinh Yeu"));
         lstword.add((new Word("02","Fuck","Con me may")));
         lstword.add(new Word("01","Love","Tinh Yeu"));
