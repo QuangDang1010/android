@@ -6,19 +6,31 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.Toast;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 
+import vn.edu.csc.dictionary.adapter.WordAdapter;
+import vn.edu.csc.dictionary.db.DBHelper;
+import vn.edu.csc.dictionary.db.WordDBQuery;
+import vn.edu.csc.dictionary.model.Word;
+
 public class MainActivity extends AppCompatActivity implements WordAdapter.WordCallBack {
-RecyclerView rvListC;
-ArrayList<Word> lstword;
-WordAdapter wordAdapter;
+    RecyclerView rvListC;
+    ArrayList<Word> lstword;
+    WordAdapter wordAdapter;
+
+    WordDBQuery wordDBQuery;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Log.i("LOOOOOOOOOL", "main activity");
+        wordDBQuery = new WordDBQuery(this);
+
         rvListC=findViewById(R.id.rvHistory);
         //
         LoadData();
@@ -38,21 +50,10 @@ WordAdapter wordAdapter;
 
 
     void LoadData(){
-        lstword=new ArrayList<>();
-        lstword.add(new Word("01","Love","Tinh Yeu"));
-        lstword.add((new Word("02","Fuck","Con me may")));
-        lstword.add(new Word("01","Love","Tinh Yeu"));
-        lstword.add(new Word("01","Love","Tinh Yeu"));
-        lstword.add(new Word("01","Love","Tinh Yeu"));
-        lstword.add(new Word("01","Love","Tinh Yeu"));
-        lstword.add(new Word("01","Love","Tinh Yeu"));
-        lstword.add(new Word("01","Love","Tinh Yeu"));
-        lstword.add((new Word("02","Fuck","Con me may")));
-        lstword.add(new Word("01","Love","Tinh Yeu"));
-        lstword.add(new Word("01","Love","Tinh Yeu"));
-        lstword.add(new Word("01","Love","Tinh Yeu"));
-        lstword.add(new Word("01","Love","Tinh Yeu"));
-        lstword.add(new Word("01","Love","Tinh Yeu"));
+        lstword = wordDBQuery.getSampleData(20);
+        /*lstword = new ArrayList<>();
+        lstword.add(new Word(1,"asd", "wqd"));*/
+
     }
 
     //    @Override
