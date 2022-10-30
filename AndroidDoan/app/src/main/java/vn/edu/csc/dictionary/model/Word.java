@@ -1,6 +1,8 @@
 package vn.edu.csc.dictionary.model;
 
-public class Word {
+import java.io.Serializable;
+
+public class Word implements Serializable {
     int wordId;
     String name;
     String lang;

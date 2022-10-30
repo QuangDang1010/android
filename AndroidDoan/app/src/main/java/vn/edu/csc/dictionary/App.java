@@ -11,6 +11,7 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         dbHelper = new DBHelper(this);
-        dbHelper.copyDB();
+        dbHelper.createDB();
+        //dbHelper.copyDB();
     }
 }
