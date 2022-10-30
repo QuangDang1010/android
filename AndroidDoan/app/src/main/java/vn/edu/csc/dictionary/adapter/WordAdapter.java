@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
@@ -15,9 +16,9 @@ import vn.edu.csc.dictionary.R;
 import vn.edu.csc.dictionary.model.Word;
 
 public class WordAdapter extends RecyclerView.Adapter<WordAdapter.WordViewHolder> {
-ArrayList<Word>lstWord;
-Context context;
-WordCallBack wordCallBack;
+    ArrayList<Word>lstWord;
+    Context context;
+    WordCallBack wordCallBack;
 
     public WordAdapter(ArrayList<Word> lstWord, WordCallBack wordCallBack) {
         this.lstWord = lstWord;
@@ -40,10 +41,9 @@ WordCallBack wordCallBack;
         Word item=lstWord.get(position); // lay tung tu cua du lieu
         //gan vao item cua view
         holder.tvWord.setText(item.getName());
-        holder.tvMeaning.setText(item.getLang());
+        holder.tvMeaning.setText("["+item.getLang()+"]");
         //lay su kien
-        holder.itemView.setOnClickListener(view -> wordCallBack.onItemClick(item.getName()));
-        holder.itemView.setOnClickListener(view -> wordCallBack.onItemClick(item.getLang()));
+        holder.itemView.setOnClickListener(view -> wordCallBack.onItemClick(item));
 
     }
 
@@ -61,8 +61,8 @@ WordCallBack wordCallBack;
 
     }
 
-    public  interface WordCallBack{
-        void onItemClick(String name);
+    public interface WordCallBack{
+        void onItemClick(Word word);
     }
 
 }

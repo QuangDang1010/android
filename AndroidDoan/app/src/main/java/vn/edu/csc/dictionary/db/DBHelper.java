@@ -39,15 +39,37 @@ public class DBHelper {
             os.flush();
             os.close();
             is.close();
+            Log.d("copyDB", "copyDB successfully");
         }catch (Exception e){
-            Toast.makeText(context, "Copy DB failed", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "CopyDB failed", Toast.LENGTH_SHORT).show();
             e.printStackTrace();
-            Log.e("DBFAIL", e.getMessage() );
         }
      }
 
     public SQLiteDatabase openDB(){
-        return context.openOrCreateDatabase(DB_NAME, Context.MODE_PRIVATE, null);
+        //return context.openOrCreateDatabase(DB_NAME, Context.MODE_PRIVATE, null);
+        return SQLiteDatabase.openDatabase(DB_PATH + DB_NAME, null, SQLiteDatabase.OPEN_READWRITE);
+    }
+
+    public boolean checkDB(){
+        SQLiteDatabase db = null;
+        try{
+            db = SQLiteDatabase.openDatabase(DB_PATH + DB_NAME, null, SQLiteDatabase.OPEN_READONLY);
+        }catch(SQLException e) {
+            //e.printStackTrace();
+            return false;
+        }
+        db.close();
+        return true;
+    }
+
+    public void createDB(){
+        if(!checkDB()){
+            copyDB();
+            //context.openOrCreateDatabase(DB_NAME, Context.MODE_PRIVATE, null);
+        }
+
+        Log.d("createDB", "" + checkDB());
     }
 
     public void closeDB(SQLiteDatabase db){
