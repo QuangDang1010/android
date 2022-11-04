@@ -31,6 +31,7 @@ public class DetailAdapter extends RecyclerView.Adapter<DetailAdapter.DetailVH> 
             case DetailRow.WORD_TYPE:
                 layout = R.layout.detail_row_word;
                 break;
+            case DetailRow.PHRASE_TYPE:
             case DetailRow.CLASS_TYPE:
                 layout = R.layout.detail_row_class;
                 break;

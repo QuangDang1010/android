@@ -14,6 +14,7 @@ public class WordQuery {
     final String TB_NAME = "WORD";
     final String ID_COL = "WORDID";
     final String WORD_COL = "WORD";
+    public static final String WORD = "WORD";
 
     public WordQuery(Context context){
         dbHelper = new DBHelper(context);
@@ -78,15 +79,16 @@ public class WordQuery {
         return res;
     }
 
-    public ArrayList<Word> getFavoriteWords(){
+    public ArrayList<Word> getFavoriteWords(String orderBy, boolean asc){
         SQLiteDatabase dbo = dbHelper.openDB();
         ArrayList<Word> res = new ArrayList<>();
         String sqlq = "SELECT *"
-                + " FROM "+TB_NAME
-                + " WHERE " + ID_COL + " IN ( "
-                + " SELECT " + FavoriteQuery.ID_FAVORITE
-                + " FROM " + FavoriteQuery.TB_FAVORITE
-                +")";
+                + " FROM "+TB_NAME + " w "
+                + " JOIN "+FavoriteQuery.TB_FAVORITE + " f "
+                +" ON w."+ID_COL+" = f."+FavoriteQuery.WORD_FAVORITE
+                + " ORDER BY " + orderBy;
+        if(!asc)sqlq += " DESC";
+
         Cursor cur = dbo.rawQuery(sqlq, null);
 
         while(cur.moveToNext()){

@@ -12,8 +12,10 @@ public class FavoriteQuery {
 
     final String TB_NAME = "FAVORITE";
     final String WORDID_COL = "WORDID";
+    final String ID_COL = "ID";
     public static final String TB_FAVORITE = "FAVORITE";
-    public static final String ID_FAVORITE = "WORDID";
+    public static final String ID_FAVORITE = "ID";
+    public static final String WORD_FAVORITE = "WORDID";
 
     public FavoriteQuery(Context context){
         dbHelper = new DBHelper(context);
@@ -41,6 +43,7 @@ public class FavoriteQuery {
     public boolean add(int wordID){
         SQLiteDatabase dbo = dbHelper.openDB();
         ContentValues cv = new ContentValues();
+        cv.putNull(ID_COL);
         cv.put(WORDID_COL, wordID);
         long added = dbo.insert(TB_NAME,null, cv);
 

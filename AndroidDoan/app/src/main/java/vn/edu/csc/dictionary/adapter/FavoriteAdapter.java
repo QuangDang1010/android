@@ -58,8 +58,8 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.favori
     }
 
     public void selectAll(boolean select){
-        selectAll = true && select;
-        unSelectAll = true && !select;
+        selectAll = select;
+        unSelectAll = !select;
         notifyDataSetChanged();
     }
 

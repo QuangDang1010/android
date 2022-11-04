@@ -1,16 +1,26 @@
 package vn.edu.csc.dictionary;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.RadioGroup;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,14 +34,17 @@ import vn.edu.csc.dictionary.model.Word;
 public class FavoriteActivity extends AppCompatActivity implements FavoriteAdapter.EventListener {
 
     RecyclerView rvFavorite;
-    ArrayList<Word> words;
-    ArrayList<Integer> selectedWords;
     Button btnSelect, btnDelete;
     TextView tvMessage;
 
     FavoriteAdapter favoriteAdapter;
     WordQuery wordQuery;
     FavoriteQuery favoriteQuery;
+    ArrayList<Word> words = new ArrayList<>();
+    ArrayList<Integer> selectedWords = new ArrayList<>();
+    String orderBy;
+    boolean asc;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,11 +61,73 @@ public class FavoriteActivity extends AppCompatActivity implements FavoriteAdapt
 
         wordQuery = new WordQuery(this);
         favoriteQuery = new FavoriteQuery(this);
-
-        selectedWords = new ArrayList<>();
+        orderBy = FavoriteQuery.ID_FAVORITE;
+        asc = false;
 
         btnDelete.setOnClickListener(view -> delete());
         btnSelect.setOnClickListener(view -> selectAll());
+        setAdapter();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.favorite_menu, menu);
+        
+        return true;
+        //return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if(item.getItemId() == R.id.icSort){
+            sortDialog();
+        }
+        
+        return super.onOptionsItemSelected(item);
+    }
+
+    void sortDialog(){
+        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+        dialog.setTitle("SORT");
+
+        View view = getLayoutInflater().inflate(R.layout.sort_dialog, null);
+        Spinner spOrder = view.findViewById(R.id.spOrder);
+        RadioGroup rgAsc = view.findViewById(R.id.rgAsc);
+
+        ArrayList<String> orderLst = new ArrayList<>();
+        orderLst.add("Time");
+        orderLst.add("Alphabetical");
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, androidx.appcompat.R.layout.support_simple_spinner_dropdown_item, orderLst);
+        spOrder.setAdapter(adapter);
+
+        dialog.setView(view);
+        dialog.setPositiveButton("Apply", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                String order =  spOrder.getSelectedItem().toString();
+                if(order.equals(orderLst.get(0))) orderBy = FavoriteQuery.ID_FAVORITE;
+                else orderBy = WordQuery.WORD;
+                asc = rgAsc.getCheckedRadioButtonId() == R.id.rbAsc;
+                loadData();
+
+                dialogInterface.dismiss();
+            }
+        });
+        dialog.setNegativeButton("Cancle", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+
+        dialog.create();
+        dialog.show();
+    }
+
+    private void setAdapter() {
+        favoriteAdapter = new FavoriteAdapter(words, this);
+        rvFavorite.setAdapter(favoriteAdapter);
+        rvFavorite.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
     }
 
     @Override
@@ -62,12 +137,12 @@ public class FavoriteActivity extends AppCompatActivity implements FavoriteAdapt
     }
 
     void loadData(){
-        words = getData();
+        ArrayList<Word> newWords = getData();
+        words.clear();
+        words.addAll(newWords);
         if(words.size() == 0) tvMessage.setText("Your favorite words will be saved here");
         else tvMessage.setText("");
-        favoriteAdapter = new FavoriteAdapter(words, this);
-        rvFavorite.setAdapter(favoriteAdapter);
-        rvFavorite.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        favoriteAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -89,13 +164,44 @@ public class FavoriteActivity extends AppCompatActivity implements FavoriteAdapt
     }
 
     ArrayList<Word> getData(){
-        ArrayList<Word> res = wordQuery.getFavoriteWords();
+        ArrayList<Word> res = wordQuery.getFavoriteWords(orderBy, asc);
         return res;
     }
 
     void updateSelectState(){
         btnSelect.setText(selectedWords.size() < words.size()? "Select All": "Unselect ALL");
         btnDelete.setBackgroundColor(Color.parseColor(selectedWords.size()>0?"#D60D0D":"#808080"));
+    }
+
+    void delete(){
+        if(selectedWords.size() == 0) return;
+
+        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+        dialog.setTitle("REMOVE");
+        dialog.setMessage("Remove "+selectedWords.size()+" from Favorite?");
+        dialog.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                int deletedCount = 0;
+                for(int j=0;j<selectedWords.size();j++){
+                    boolean deleted = favoriteQuery.delete(selectedWords.get(j));
+                    if(deleted) deletedCount++;
+                }
+                Toast.makeText(FavoriteActivity.this, "removed "+deletedCount+" items from favorite", Toast.LENGTH_SHORT).show();
+                loadData();
+                favoriteAdapter.selectAll(false);
+                dialogInterface.dismiss();
+            }
+        });
+        dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+        dialog.create();
+        dialog.show();
+
     }
 
     @Override
@@ -121,20 +227,5 @@ public class FavoriteActivity extends AppCompatActivity implements FavoriteAdapt
         Intent intent = new Intent(this, DetailActivity.class);
         intent.putExtra("word", word);
         startActivity(intent);
-    }
-
-    void delete(){
-        if(selectedWords.size() == 0) return;
-
-        //alert dialog here
-
-        int deletedCount = 0;
-        for(int i=0;i<selectedWords.size();i++){
-            boolean deleted = favoriteQuery.delete(selectedWords.get(i));
-            if(deleted) deletedCount++;
-        }
-
-        Toast.makeText(this, "deleted "+deletedCount+" items", Toast.LENGTH_SHORT).show();
-        Log.d("delete", "deleted "+deletedCount+" items");
     }
 }
