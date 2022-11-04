@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -44,7 +45,7 @@ public class WordAdapter extends RecyclerView.Adapter<WordAdapter.WordViewHolder
         holder.tvMeaning.setText("["+item.getLang()+"]");
         //lay su kien
         holder.itemView.setOnClickListener(view -> wordCallBack.onItemClick(item));
-
+        holder.btnDelete.setOnClickListener(view -> wordCallBack.onItemDelete(item));
     }
 
     @Override
@@ -53,16 +54,19 @@ public class WordAdapter extends RecyclerView.Adapter<WordAdapter.WordViewHolder
     class WordViewHolder extends RecyclerView.ViewHolder{
             TextView tvWord;
             TextView tvMeaning;
+            ImageView btnDelete;
         public WordViewHolder(@NonNull View itemview){
             super(itemview);
             tvWord=itemview.findViewById(R.id.tvWord);
             tvMeaning=itemview.findViewById(R.id.tvMeaning);
+            btnDelete = itemview.findViewById(R.id.btnDelete);
         }
 
     }
 
     public interface WordCallBack{
         void onItemClick(Word word);
+        void onItemDelete(Word word);
     }
 
 }
